@@ -4,20 +4,22 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
+// import ExtractedData from "../models/ExtractedData";
+
 interface ContentProps {
   title: string;
 }
 
 export function UploadContent(props: ContentProps) {
 
-  const handleFileUpload = async (file: File) => {
+  const handleFileUpload = async (file: File, fileName: string) => {
     try {
       // Create a FormData object to send the file
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("sampleFile", file, fileName); // use fileName here if needed
 
       // Send a POST request to the server
-      const response = await fetch("https://mockurl.com/parse", {
+      const response = await fetch("http://localhost:3000/api/parseInvoice", {
         method: "POST",
         body: formData,
       });
@@ -30,12 +32,22 @@ export function UploadContent(props: ContentProps) {
       // Parse the JSON response
       const result = await response.json();
 
-      // Check if the response indicates success
-      if (result.success) {
 
-        // Save the CSV data to MongoDB 
-        saveToMongoDB(result.data);
+      if (result) {
+        console.log("This is result: ", result);
+        // Extract fileType from fileName
+        const fileType = fileName.split(".").pop()?.toUpperCase() || "UNKNOWN";
 
+        // Format data to be saved to MongoDB
+        const dataToSave = result.map((doc: any) => ({
+          data: doc,
+          fileName,
+          createdOn: new Date(),
+          fileType,
+        }));
+
+        // Save the formatted data to MongoDB
+        saveToMongoDB(dataToSave);
         // Indicate successful upload
         console.log("Upload successful");
         toast.success("Upload Successful");
@@ -54,6 +66,8 @@ export function UploadContent(props: ContentProps) {
  * @param {Object} obj - The object to be saved
  */
   async function saveToMongoDB(obj: any) {
+    console.log(obj);
+    console.log("testing");
     axios.post("http://localhost:3000/api/save", obj) // TODO: adjust the URL later
       .then(response => {
         console.log("Data saved successfully:", response.data);
@@ -63,7 +77,7 @@ export function UploadContent(props: ContentProps) {
       });
   }
 
-  //testData
+  // // testData
   // const testData = new ExtractedData({
   //   data: { key: "value" },
   //   fileName: "someFile.pdf",

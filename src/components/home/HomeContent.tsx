@@ -1,63 +1,58 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { SidePanel } from "../SidePanel";
-import { HomeMainContent } from "./HomeMainContent";
+import { HomeMainContent } from "./HomeMainContent"; // You might need to import this if it's used in your component
 
 interface HomeContentProps {
-  title: string;
+    title: string;
+}
+
+interface File {
+    name: string;
+    createdOn: string;
+    type: string;
+    data: Data;
+}
+
+interface Data {
+    bill_to: string;
+    items: DataItem[];
+    amount_due: string;
+}
+
+interface DataItem {
+    item_description: string;
+    item_quantity: string;
+    item_price: string;
+    item_total: string;
+    tax_amount: string;
 }
 
 export function HomeContent(props: HomeContentProps) {
 
-    const mockJSONData = {
-        "header1": "value1",
-        "header2": "value2",
-        "header3": "value3",
-        parse() {
-            return Object.values(this);
-        },
-        stringify() {
-            return Object.values(this).join(",");
-        },
-        [Symbol.toStringTag]: "Object",
+    const [files, setFiles] = useState<File[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get("http://localhost:3000/api/fetchAllFiles");
+                if (response.status !== 200) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data: File[] = response.data.data; // Access the data property of the response object.
+                setFiles(data);
+            } catch (error) {
+                console.error("There has been a problem with your fetch operation:", error);
+            }
         };
 
-        // Mock data for testing
-        const mockFiles = [
-        {
-            name: "Document 1",
-            createdOn: "2023-09-25",
-            type: "PDF",
-            data: [mockJSONData],
-        },
-        {
-            name: "Presentation",
-            createdOn: "2023-09-24",
-            type: "PPT",
-            data: [mockJSONData],
-        },
-        {
-            name: "Spreadsheet",
-            createdOn: "2023-09-23",
-            type: "XLS",
-            data: [mockJSONData],
-        },
-        {
-            name: "Image 1",
-            createdOn: "2023-09-22",
-            type: "JPG",
-            data: [mockJSONData],
-        },
-        {
-            name: "Document 2",
-            createdOn: "2023-09-21",
-            type: "PDF",
-            data: [mockJSONData],
-        },
-        ];
+        fetchData();
+    }, []);
 
     return (
         <div className="flex h-full flex-wrap overflow-auto">
-        <HomeMainContent files={mockFiles}/>
-        <SidePanel />
+            <HomeMainContent files={files} />
+            <SidePanel />
         </div>
     );
 }

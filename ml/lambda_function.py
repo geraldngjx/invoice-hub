@@ -4,9 +4,9 @@ import boto3
 
 from botocore.exceptions import ClientError
 
-from models import OCRModel
+from models import ParserModel
 
-ocr_model = OCRModel()
+model = ParserModel()
 
 def lambda_handler(event, context):
     try:
@@ -14,15 +14,12 @@ def lambda_handler(event, context):
         body = json.loads(body)
         img_bytes_str = body['image']
 
-        text = ocr_model(img_bytes_str)
+        out = model(img_bytes_str)
 
         lambda_response = {
             'statusCode': 200,
-            'body': {
-                "Text": text
-            }
+            'body': out
         }
-
     except ClientError as err:
         error_message = "Couldn't analyze image. " + \
             err.response['Error']['Message']

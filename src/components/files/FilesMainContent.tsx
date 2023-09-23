@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { saveAs } from "file-saver";
 
 interface File {
   name: string;
   createdOn: string;
   type: string;
+  data: JSON[];
 }
 
 interface FilesMainContentProps {
@@ -20,6 +22,29 @@ export function FilesMainContent(props: FilesMainContentProps) {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+  };
+
+  const convertDataToCSV = (jsonData: JSON[]) => {
+    const csvRows = [];
+
+    // Extract headers from the first object
+    const headers = Object.keys(jsonData[0]);
+    csvRows.push(headers.join(","));
+
+    // Loop through each JSON object and convert it to a CSV row
+    for (const row of jsonData) {
+      const values = headers.map((header: string) => row[header as keyof typeof row]);
+      csvRows.push(values.join(","));
+    }
+
+    return csvRows.join("\n");
+  };
+
+  // Function to handle the download button click
+  const handleDownloadClick = (file: File) => {
+    const csvData = convertDataToCSV(file.data);
+    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
+    saveAs(blob, `${file.name}.csv`);
   };
 
   return (
@@ -40,18 +65,21 @@ export function FilesMainContent(props: FilesMainContentProps) {
           {filteredFiles.map((file, index) => (
             <li
               key={index}
-              className="mb-2 flex items-center justify-between rounded-md bg-gray-700 p-2"
+              className="mb-2 flex items-center justify-between rounded-md bg-gray-700 p-4"
             >
               <div>
-                <p className="font-semibold text-white">{file.name}</p>
+                <p className=" text-lg font-semibold text-white">{file.name}</p>
                 <p className="text-sm text-gray-400">Type: {file.type}</p>
                 <p className="text-sm text-gray-400">Created On: {file.createdOn}</p>
               </div>
               <div>
-                <button className="mr-2 text-blue-500 hover:text-blue-700">
+                <button
+                  onClick={() => handleDownloadClick(file)} // Call the download function with the file data
+                  className="mr-4 text-lg text-blue-500 hover:text-blue-700"
+                >
                   Download
                 </button>
-                <button className="text-red-500 hover:text-red-700">Delete</button>
+                <button className="mr-2 text-lg text-red-500 hover:text-red-700">Delete</button>
               </div>
             </li>
           ))}

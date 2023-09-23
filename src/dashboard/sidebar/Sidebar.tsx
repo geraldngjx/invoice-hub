@@ -34,7 +34,7 @@ export function Sidebar({ mobileOrientation }: SidebarProps) {
     >
       <div className={sidebarStyle.container}>
         <div className="sticky top-0 z-10 mb-6 flex items-center justify-center bg-gray-900 pb-6 pt-3">
-          <img src="/images/2.png" width={80} height={90} alt="Enoch Ndika" />
+          <img src="/images/search.png" width={40} height={40} alt="F.R.I.D.A.Y." className="mt-3" />
         </div>
         <SidebarItems />
       </div>

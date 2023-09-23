@@ -53,10 +53,28 @@ export function FilesContent(props: ContentProps) {
       type: "PDF",
       data: [mockJSONData],
     },
+    {
+      name: "Document 2",
+      createdOn: "2023-09-21",
+      type: "PDF",
+      data: [mockJSONData],
+    },
+    {
+      name: "Document 2",
+      createdOn: "2023-09-21",
+      type: "PDF",
+      data: [mockJSONData],
+    },
+    {
+      name: "Document 2",
+      createdOn: "2023-09-21",
+      type: "PDF",
+      data: [mockJSONData],
+    },
   ];
 
   return (
-    <div className="flex flex-wrap">
+    <div className="flex h-full flex-wrap">
       <FilesMainContent title={props.title} files={mockFiles}/>
       <SidePanel />
     </div>

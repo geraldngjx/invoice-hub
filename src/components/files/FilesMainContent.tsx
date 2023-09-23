@@ -48,7 +48,7 @@ export function FilesMainContent(props: FilesMainContentProps) {
   };
 
   return (
-    <div className="w-full rounded-3xl bg-gray-800 p-6 lg:w-8/12">
+    <div className="h-full w-full overflow-y-auto rounded-3xl bg-gray-800 p-6 lg:w-8/12">
       <div className="mb-8 flex items-center justify-between text-white">
         <p className="text-2xl font-bold">{props.title}</p>
       </div>

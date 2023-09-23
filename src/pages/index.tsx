@@ -1,5 +1,5 @@
-import { UploadContent } from "../components/upload/UploadContent";
+import { HomeContent } from "../components/home/HomeContent";
 
 export default function HomePage() {
-  return <UploadContent title="Home" />;
+  return <HomeContent title="Home" />;
 }

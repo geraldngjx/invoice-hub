@@ -4,7 +4,7 @@ import json
 import os
 import openai
 
-from botocore.exceptions import ClientError
+
 from pydantic import BaseModel, Field
 from typing import Optional
 

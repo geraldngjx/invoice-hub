@@ -1,5 +1,5 @@
-import { Content } from "../../components/Content";
+import { UploadContent } from "../../components/UploadContent";
 
 export default function CreditsPage() {
-  return <Content title="Credits" />;
+  return <UploadContent title="Credits" />;
 }

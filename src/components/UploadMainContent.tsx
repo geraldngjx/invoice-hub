@@ -27,24 +27,24 @@ export function UploadMainContent(props: UploadMainContentProps) {
   return (
     <div className="w-full rounded-3xl bg-gray-800 p-6 lg:w-8/12">
       <div className="mb-8 flex items-center justify-between text-white">
-        <p className="text-2xl font-bold">{props.title}</p>
+        <p className="mb-10 text-2xl font-bold">{props.title}</p>
       </div>
       <div className="text-white">
-        <div className="text-white text-center">
-            <label className="text-lg mb-2">
+        <div className="flex flex-col justify-center text-center text-white">
+            <label className="mb-2 text-lg">
                 <FontAwesomeIcon icon={faUpload} size="3x" />
                 <input
                 type="file"
                 accept=".zip"
                 onChange={handleFileChange}
-                className="hidden"
+                className="mb-10 hidden"
                 />
             </label>
-            <p>Click the icon to upload a Zip File</p>
+            <p className="my-10">Click the icon to upload a Zip File</p>
             </div>
             <button
             onClick={handleUploadClick}
-            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full w-full"
+            className="mt-10 w-full rounded-full bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
             >
             Upload
             </button>

@@ -190,7 +190,7 @@ export function HomeMainContent(_props: HomeMainContentProps) {
                             <tbody>
                                 {outflowCategories.map((category, index) => (
                                     <tr key={index}>
-                                        <td className="border border-gray-500 py-2 px-4">{category}</td>
+                                        <td className="border border-gray-500 px-4 py-2">{category}</td>
                                     </tr>
                                 ))}
                             </tbody>

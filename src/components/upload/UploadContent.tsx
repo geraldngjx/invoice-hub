@@ -2,6 +2,7 @@ import { SidePanel } from "../SidePanel";
 import { UploadMainContent } from "./UploadMainContent";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 interface ContentProps {
   title: string;
@@ -14,7 +15,7 @@ export function UploadContent(props: ContentProps) {
       // Create a FormData object to send the file
       const formData = new FormData();
       formData.append("file", file);
-    
+
       // Send a POST request to the server
       const response = await fetch("https://mockurl.com/parse", {
         method: "POST",
@@ -32,7 +33,7 @@ export function UploadContent(props: ContentProps) {
       // Check if the response indicates success
       if (result.success) {
 
-        // Save the CSV data to MongoDB (replace with your MongoDB logic)
+        // Save the CSV data to MongoDB 
         saveToMongoDB(result.data);
 
         // Indicate successful upload
@@ -47,15 +48,34 @@ export function UploadContent(props: ContentProps) {
       toast.error("Upload failed");
     }
   };
-  
-  // Function to save CSV data to MongoDB (replace with your MongoDB logic)
-  function saveToMongoDB(csvData: JSON[]) {
-    // Your MongoDB saving logic here
+
+  /**
+ * Save an object to MongoDB
+ * @param {Object} obj - The object to be saved
+ */
+  async function saveToMongoDB(obj: any) {
+    axios.post("http://localhost:3000/api/save", obj) // TODO: adjust the URL later
+      .then(response => {
+        console.log("Data saved successfully:", response.data);
+      })
+      .catch(error => {
+        console.error("Error saving data:", error);
+      });
   }
+
+  //testData
+  // const testData = new ExtractedData({
+  //   data: { key: "value" },
+  //   fileName: "someFile.pdf",
+  //   createdOn: new Date(),
+  //   fileType: "PDF",
+  // });
+
+  // saveToMongoDB(testData);
 
   return (
     <div className="flex flex-wrap">
-      <UploadMainContent title={props.title} onFileUpload={handleFileUpload}/>
+      <UploadMainContent title={props.title} onFileUpload={handleFileUpload} />
       <SidePanel />
       <ToastContainer position="bottom-right" autoClose={3000} />
     </div>

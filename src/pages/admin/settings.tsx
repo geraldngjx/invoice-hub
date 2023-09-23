@@ -1,5 +1,5 @@
-import { Content } from "../../components/UploadContent";
+import { UploadContent } from "../../components/upload/UploadContent";
 
 export default function SettingsPage() {
-  return <Content title="Settings" />;
+  return <UploadContent title="Settings" />;
 }

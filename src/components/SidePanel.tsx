@@ -46,7 +46,7 @@ export function SidePanel() {
               className="flex w-full border-t border-gray-700 p-4 hover:bg-gray-700 2xl:items-start">
               <div className="w-full pl-4">
                 <div className={`mb-2 text-lg font-medium text-white ${
-                transaction.type === "inflow" ? "text-green-400" : "text-red-400"
+                transaction.type === "inflow" ? "text-green-500" : "text-red-500"
               }`}>
                   {transaction.description}
                 </div>

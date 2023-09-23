@@ -1,4 +1,4 @@
-import { UploadContent } from "../../components/UploadContent";
+import { UploadContent } from "../../components/upload/UploadContent";
 
 export default function UploadPage() {
   return <UploadContent title="Upload" />;

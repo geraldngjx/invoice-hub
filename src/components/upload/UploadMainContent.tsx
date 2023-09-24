@@ -72,7 +72,7 @@ export function UploadMainContent(props: UploadMainContentProps) {
             placeholder="Enter File Name"
             value={fileName}
             onChange={(e) => setFileName(e.target.value)}
-            className="mt-6 w-full rounded-lg border border-gray-300 px-4 py-2"
+            className="mt-6 w-full rounded-lg border border-gray-300 px-4 py-2 text-black placeholder:text-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-600"
           />
         </div>
         <button

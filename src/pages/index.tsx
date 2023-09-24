@@ -1,5 +1,5 @@
 import { HomeContent } from "../components/home/HomeContent";
 
 export default function HomePage() {
-  return <HomeContent title="Home" />;
+  return <HomeContent/>;
 }

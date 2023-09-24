@@ -186,9 +186,16 @@ export function HomeMainContent(_props: HomeMainContentProps) {
     };
 
     // Function to handle month and year selection
-    const handleSelectMonthYear = (month: number, year: number) => {
-        setSelectedMonth(month);
-        setSelectedYear(year);
+    const handleSelectMonthYear = (month: string, year: string) => {
+        const monthInt = parseInt(month);
+        const yearInt = parseInt(year);
+        if (!isNaN(monthInt) && !isNaN(yearInt)) {
+            setSelectedMonth(monthInt);
+            setSelectedYear(yearInt);
+        } else {
+            setSelectedMonth(null);
+            setSelectedYear(null);
+        }
     };
 
     // Function to filter data by month and year
@@ -363,10 +370,10 @@ export function HomeMainContent(_props: HomeMainContentProps) {
         <div className="h-full w-full overflow-y-auto rounded-3xl bg-gray-800 p-6 lg:w-8/12" >
             <h2 className="text-2xl font-bold text-white">Overview</h2>
             {/* Year selection dropdown */}
-            <div className="mr-20 mt-4 flex items-center justify-end">
-                <label className="text-lg text-white">Select Year:</label>
+            <div className="mr-12 mt-4 flex items-center justify-end">
+                <label className="text-white">Select Year:</label>
                 <select
-                    className="ml-2 rounded bg-gray-700 p-2 text-white"
+                    className="ml-2 rounded bg-gray-700 p-2 text-sm text-white"
                     onChange={(e) => {
                         const selectedYear = parseInt(e.target.value);
                         handleSelectChartYear(selectedYear);
@@ -387,67 +394,74 @@ export function HomeMainContent(_props: HomeMainContentProps) {
                 </div>
             </div>
             {/* Add UI elements to select the month and year */}
-            <div className="mr-10 flex flex-wrap items-center justify-end border-t border-gray-700 pt-10">
-                <label className="text-lg text-white">Select Month and Year:</label>
-                <select
-                    className="ml-2 rounded bg-gray-700 p-2 text-white"
-                    onChange={(e) => {
-                        const [year, month] = e.target.value.split("-");
-                        handleSelectMonthYear(parseInt(month), parseInt(year));
-                    }}
-                >
-                    <option value="">Select a Month and Year</option>
-                    {/* Add options for months and years */}
-                    {getUniqueMonthsAndYears(allData).map((dateString, index) => {
-                        const [year, month] = dateString.split("-");
-                        return (
-                            <option key={index} value={`${year}-${month}`}>
-                                {getMonthName(parseInt(month))} {year}
-                            </option>
-                        );
-                    })}
-                </select>
+            <div className="mr-10 flex flex-wrap items-center justify-between border-t border-white pt-5">
+                <div>
+                    <h2 className="ml-5 pb-20 text-2xl font-bold text-white">Analysis</h2>
+                </div>
+                <div>
+                    <label className="text-white">Select Month and Year:</label>
+                    <select
+                        className="ml-2 rounded bg-gray-700 p-2 text-sm text-white"
+                        onChange={(e) => {
+                            const [year, month] = e.target.value.split("-");
+                            handleSelectMonthYear(month, year);
+                        }}
+                    >
+                        <option value="null-null">Select a Month and Year</option>
+                        {/* Add options for months and years */}
+                        {getUniqueMonthsAndYears(allData).map((dateString, index) => {
+                            const [year, month] = dateString.split("-");
+                            return (
+                                <option key={index} value={`${year}-${month}`}>
+                                    {getMonthName(parseInt(month))} {year}
+                                </option>
+                            );
+                        })}
+                    </select>
+                </div>
             </div>
             {/* Display statistics for the selected month and year */}
-            <div className="flex flex-wrap pt-10">
-                <div className="w-full p-4 lg:w-1/3">
-                    <h2 className="mb-4 text-2xl text-white">Total Monthly Outflow</h2>
-                    <div className="rounded-lg bg-gray-700 p-4 py-5">
-                        <p className="text-center text-xl font-bold text-white">${totalOutflow}</p>
+            { selectedMonth !== null && selectedYear !== null ? (
+            <div>
+                <div className="flex flex-wrap">
+                    <div className="w-full p-4 lg:w-1/3">
+                        <h2 className="mb-4 text-lg text-white">Total Monthly Outflow</h2>
+                        <div className="rounded-lg bg-gray-700 p-4 py-5">
+                            <p className="text-center font-bold text-white">${totalOutflow}</p>
+                        </div>
+                    </div>
+                    <div className="w-full p-4 lg:w-1/3">
+                        <h2 className="mb-4 text-lg text-white">Total Monthly Taxes</h2>
+                        <div className="rounded-lg bg-gray-700 p-4 py-5">
+                            <p className="text-center font-bold text-white">${totalTax}</p>
+                        </div>
+                    </div>
+                    <div className="w-full p-4 lg:w-1/3">
+                        <h2 className="mb-4 text-lg text-white">Monthly Invoice Count</h2>
+                        <div className="rounded-lg bg-gray-700 p-4 py-5">
+                            <p className="text-center font-bold text-white">{invoiceCount}</p>
+                        </div>
                     </div>
                 </div>
-                <div className="w-full p-4 lg:w-1/3">
-                    <h2 className="mb-4 text-2xl text-white">Total Monthly Taxes</h2>
-                    <div className="rounded-lg bg-gray-700 p-4 py-5">
-                        <p className="text-center text-xl font-bold text-white">${totalTax}</p>
-                    </div>
-                </div>
-                <div className="w-full p-4 lg:w-1/3">
-                    <h2 className="mb-4 text-2xl text-white">Monthly Invoice Count</h2>
-                    <div className="rounded-lg bg-gray-700 p-4 py-5">
-                        <p className="text-center text-xl font-bold text-white">{invoiceCount}</p>
-                    </div>
-                </div>
-            </div>
-            {/* Display transactions for the selected month and year */}
-            <h2 className="mt-10 border-t border-gray-700 pb-5 pt-10 text-center text-2xl text-white">Transactions</h2>
-            <div className="flex flex-wrap justify-center">
-                <table className="w-full border-collapse bg-gray-700 text-white">
-                    <thead>
-                        <tr>
-                            <th className="border border-gray-500 px-4 py-2">Invoice Number</th>
-                            <th className="border border-gray-500 px-4 py-2">Date</th>
-                            <th className="border border-gray-500 px-4 py-2">Buyer</th>
-                            <th className="border border-gray-500 px-4 py-2">Seller</th>
-                            <th className="border border-gray-500 px-4 py-2">Amount</th>
-                            <th className="border border-gray-500 px-4 py-2">Tax Amount</th>
-                            <th className="border border-gray-500 px-4 py-2">Total Spent</th>
-                            <th className="border border-gray-500 px-4 py-2">Transaction description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {Array.isArray(filteredData) && filteredData.map((data, index) => (
-                            <tr key={index}>
+                {/* Display transactions for the selected month and year */}
+                <h2 className="mt-10 border-t border-gray-700 pb-5 pt-10 text-center text-2xl text-white">Transactions</h2>
+                <div className="flex flex-wrap justify-center">
+                    <table className="w-full border-collapse bg-gray-700 text-white">
+                        <thead>
+                            <tr>
+                                <th className="border border-gray-500 px-4 py-2">Invoice Number</th>
+                                <th className="border border-gray-500 px-4 py-2">Date</th>
+                                <th className="border border-gray-500 px-4 py-2">Buyer</th>
+                                <th className="border border-gray-500 px-4 py-2">Seller</th>
+                                <th className="border border-gray-500 px-4 py-2">Amount</th>
+                                <th className="border border-gray-500 px-4 py-2">Tax Amount</th>
+                                <th className="border border-gray-500 px-4 py-2">Total Spent</th>
+                                <th className="border border-gray-500 px-4 py-2">Transaction description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Array.isArray(currentTransactions) && currentTransactions.map((data, index) => (
+                                <tr key={index}>
                                 <td className="border border-gray-500 px-4 py-2">{data.invoice_number}</td>
                                 <td className="border border-gray-500 px-4 py-2">{data.invoice_date}</td>
                                 <td className="border border-gray-500 px-4 py-2">{data.bill_from}</td>
@@ -490,6 +504,12 @@ export function HomeMainContent(_props: HomeMainContentProps) {
                     </div>
                 </div>
             </div>
+            ) : 
+            (<div className="rounded-lg bg-gray-700 p-4 py-5">
+                <p className="text-center text-sm text-white">Select a valid timeframe to view insights</p>
+            </div>
+            )}
+        </div>
     );
 }
 

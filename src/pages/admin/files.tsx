@@ -26,6 +26,7 @@ interface Data {
 interface File {
   _id: string;
   fileName: string;
+  invoices: any[];
   createdOn: string;
   fileType: string;
   data: Data;

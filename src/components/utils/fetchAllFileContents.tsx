@@ -35,7 +35,7 @@ export function useFetchAllFileContents() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/fetchAllFiles");
+        const response = await axios.get("/api/fetchAllFiles");
         if (response.status !== 200) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

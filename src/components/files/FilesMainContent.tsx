@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { saveAs } from "file-saver";
+import React, { useState, useEffect } from "react";
 import ExcelJS from "exceljs";
 
 
@@ -33,8 +32,15 @@ interface FilesMainContentProps {
 
 export function FilesMainContent(props: FilesMainContentProps) {
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true); // Track loading state
 
-  console.log(props);
+  useEffect(() => {
+    // When the files are fetched, set isLoading to false
+    if (props.files) {
+      setIsLoading(false);
+    }
+  }, [props.files]);
+
   const filteredFiles = Array.isArray(props.files)
     ? props.files.filter((file) => file.fileName?.toLowerCase().includes(searchTerm.toLowerCase()))
     : [];
@@ -61,7 +67,7 @@ export function FilesMainContent(props: FilesMainContentProps) {
   //   return `${headers.join(",")}\n${values.join(",")}`;
   // };
 
-  const createWorkbookFromFiles = (files) => {
+  const createWorkbookFromFiles = (files : any) => {
     console.log(files);
     const workbook = new ExcelJS.Workbook();
 
@@ -81,7 +87,7 @@ export function FilesMainContent(props: FilesMainContentProps) {
     ];
 
     // Loop through each InvoiceCollection document
-    files.invoices.forEach((invoice) => {
+    files.invoices.forEach((invoice : any) => {
       const invoiceData = invoice.data;
       // Loop through each invoice in the invoices array of the InvoiceCollection document
       // file.invoices.forEach((invoice) => {
@@ -133,29 +139,34 @@ export function FilesMainContent(props: FilesMainContentProps) {
           value={searchTerm}
           onChange={handleSearchChange}
         />
-        <ul className="mt-2">
-          {filteredFiles.map((file) => (
-            <li
-              key={file._id}
-              className="mb-2 flex items-center justify-between rounded-md bg-gray-700 p-4"
-            >
+        {isLoading ? ( // Display loading spinner when isLoading is true
+          <div className="flex h-40 items-center justify-center text-white">
+            <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-t-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <ul className="mt-2">
+            {filteredFiles.map((file) => (
+              <li
+                key={file._id}
+                className="mb-2 flex items-center justify-between rounded-md bg-gray-700 p-4"
+              >
               <div>
                 <p className="text-lg font-semibold text-white">{file.fileName}</p>
-                <p className="text-sm text-gray-400">Type: {file.fileType}</p>
                 <p className="text-sm text-gray-400">Created On: {file.createdOn}</p>
               </div>
               <div>
                 <button
                   onClick={() => handleDownloadClick(file)}
-                  className="mr-4 text-lg text-blue-500 hover:text-blue-700"
+                  className="mr-4 text-sm text-blue-500 hover:text-blue-700"
                 >
                   Download
                 </button>
-                <button className="mr-2 text-lg text-red-500 hover:text-red-700">Delete</button>
+                <button className="mr-2 text-sm text-red-500 hover:text-red-700">Delete</button>
               </div>
             </li>
           ))}
         </ul>
+        )}
       </div>
     </div>
   );

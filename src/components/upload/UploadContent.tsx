@@ -12,6 +12,10 @@ export function UploadContent(props: ContentProps) {
 
   const handleFileUpload = async (file: File, fileName: string) => {
     try {
+      toast.info("Task in progress...", {
+        autoClose: false, // To keep it open until you manually close it
+      });
+  
       // Create a FormData object to send the file
 
       const formData = new FormData();
@@ -21,28 +25,25 @@ export function UploadContent(props: ContentProps) {
       //pre-create InvoiceCollection Object
       const initialResponse = await axios.post("/api/invoiceCollections", { fileName, invoices: [] });
       if (!initialResponse.data.success) throw new Error("Initial save failed");
-
-
       // Send a POST request to the server
       const response = await fetch("/api/parseInvoice", {
         method: "POST",
         body: formData,
       });
-
+  
       if (!response.ok) {
         // Handle the error if the request is not successful
         throw new Error(`Upload failed with status ${response.status}`);
       }
-
+  
       // Parse the JSON response
       const result = await response.json();
-
-
+  
       if (result) {
         console.log("This is result: ", result);
         // Extract fileType from fileName
         const fileType = result.fileType || fileName.split(".").pop()?.toUpperCase() || "UNKNOWN";
-
+  
         // Format data to be saved to MongoDB
         const dataToSave = result.map((doc: any) => ({
           data: doc,
@@ -50,7 +51,7 @@ export function UploadContent(props: ContentProps) {
           createdOn: new Date(),
           fileType,
         }));
-
+  
         // Save the formatted data to MongoDB
         saveToMongoDB(dataToSave, fileName);
         // Indicate successful upload
@@ -76,10 +77,10 @@ export function UploadContent(props: ContentProps) {
       const individualSavePromises = obj.map((invoice: any) =>
         axios.post("/api/save", invoice)
       );
-
+  
       await Promise.all(individualSavePromises);
       console.log("All individual invoices have been saved successfully.");
-
+  
       // 2. Save the collection of invoices in one Document
       const collectionSaveResponse = await axios.put("/api/invoiceCollections", { invoices: obj, fileName });
       console.log("Invoice collection has been saved successfully:", collectionSaveResponse.data);

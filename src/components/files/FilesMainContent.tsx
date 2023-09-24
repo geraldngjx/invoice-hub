@@ -2,6 +2,14 @@ import React, { useState, useEffect } from "react";
 import ExcelJS from "exceljs";
 import axios from "axios";
 
+interface DataItem {
+  item_description: string;
+  item_quantity: string;
+  item_price: string;
+  item_total: string;
+  tax_amount: string;
+}
+
 interface Data {
   bill_to: string;
   items: DataItem[];
@@ -29,6 +37,14 @@ interface FilesMainContentProps {
 
 export function FilesMainContent(props: FilesMainContentProps) {
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true); // Track loading state
+
+  useEffect(() => {
+    // When the files are fetched, set isLoading to false
+    if (props.files) {
+      setIsLoading(false);
+    }
+  }, [props.files]);
 
   const filteredFiles = Array.isArray(props.files)
     ? props.files.filter((file) =>
@@ -50,7 +66,7 @@ export function FilesMainContent(props: FilesMainContentProps) {
     });
   }, [props.files]);
 
-  const createWorkbookFromFiles = (files) => {
+  const createWorkbookFromFiles = (files : any) => {
     console.log(files);
     const workbook = new ExcelJS.Workbook();
 
@@ -74,7 +90,7 @@ export function FilesMainContent(props: FilesMainContentProps) {
     ];
 
     // Loop through each InvoiceCollection document
-    files.invoices.forEach((invoice) => {
+    files.invoices.forEach((invoice : any) => {
       const invoiceData = invoice.data;
       // Loop through each invoice in the invoices array of the InvoiceCollection document
       // file.invoices.forEach((invoice) => {
@@ -134,19 +150,20 @@ export function FilesMainContent(props: FilesMainContentProps) {
           value={searchTerm}
           onChange={handleSearchChange}
         />
-        <ul className="mt-2">
-          {filteredFiles.map((file) => (
-            <li
-              key={file._id}
-              className="mb-2 flex items-center justify-between rounded-md bg-gray-700 p-4"
-            >
+        {isLoading ? ( // Display loading spinner when isLoading is true
+          <div className="flex h-40 items-center justify-center text-white">
+            <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-t-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <ul className="mt-2">
+            {filteredFiles.map((file) => (
+              <li
+                key={file._id}
+                className="mb-2 flex items-center justify-between rounded-md bg-gray-700 p-4"
+              >
               <div>
-                <p className="text-lg font-semibold text-white">
-                  {file.fileName}
-                </p>
-                <p className="text-sm text-gray-400">
-                  Created On: {file.createdOn}
-                </p>
+                <p className="text-lg font-semibold text-white">{file.fileName}</p>
+                <p className="text-sm text-gray-400">Created On: {file.createdOn}</p>
               </div>
               <div>
                 {
@@ -168,6 +185,7 @@ export function FilesMainContent(props: FilesMainContentProps) {
             </li>
           ))}
         </ul>
+        )}
       </div>
     </div>
   );

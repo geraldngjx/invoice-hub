@@ -46,12 +46,12 @@ export function HomeMainContent(_props: HomeMainContentProps) {
     const [selectedChartYear, setSelectedChartYear] = useState<number | null>(null);
 
     const [filteredData, setFilteredData] = useState<Data[] | null>(null);
-    const [totalOutflow, setTotalOutflow] = useState<number>(0);
-    const [totalTax, setTotalTax] = useState<number>(0);
-    const [invoiceCount, setInvoiceCount] = useState<number>(0);
+    const [totalOutflow, setTotalOutflow] = useState<string>("0");
+    const [totalTax, setTotalTax] = useState<string>("0");
+    const [invoiceCount, setInvoiceCount] = useState<string>("0");
 
     const [currentPage, setCurrentPage] = useState(1);
-    const transactionsPerPage = 10;
+    const transactionsPerPage = 5;
 
     const indexOfLastTransaction = currentPage * transactionsPerPage;
     const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
@@ -150,7 +150,7 @@ export function HomeMainContent(_props: HomeMainContentProps) {
             const month = date.getMonth() + 1; // Months are 0-indexed, so add 1
             uniqueDates.add(`${year}-${month}`);
         });
-        return Array.from(uniqueDates) as string[];
+        return Array.from(uniqueDates).sort() as string[];
     };
 
     // Function to get the name of a month from its number (1-12)
@@ -163,25 +163,25 @@ export function HomeMainContent(_props: HomeMainContentProps) {
     };
 
     // Updated calculateTotal function with two parameters (type and data)
-    const calculateTotal = (type: string, data: Data[]) => {
+    const calculateTotal = (type: string, data: Data[]) : string => {
         if (type === "outflow") {
-            // Calculate the total outflow (sum of grand_total)
+            // Calculate the total outflow (sum of grand_total) and truncate to 2 decimal places
             return data.reduce((total, item) => {
                 return total + parseFloat(item.grand_total);
-            }, 0);
+            }, 0).toFixed(2);
         } else if (type === "tax_amount") {
-            // Calculate the total tax (sum of tax_amount)
+            // Calculate the total tax (sum of tax_amount) and truncate to 2 decimal places
             return data.reduce((total, item) => {
                 return total + parseFloat(item.tax_amount);
-            }, 0);
+            }, 0).toFixed(2);
         } else if (type === "invoice_count") {
             // Calculate the number of invoices (count of Data_Item in every File object)
             return data.reduce((count, item) => {
                 return count + item.items.length;
-            }, 0);
+            }, 0).toString();
         } else {
             // Handle other types if needed
-            return 0;
+            return "0";
         }
     };
 
@@ -261,7 +261,7 @@ export function HomeMainContent(_props: HomeMainContentProps) {
             const year = date.getFullYear();
             uniqueYears.add(year);
         });
-        return Array.from(uniqueYears) as string[];
+        return Array.from(uniqueYears).sort() as string[];
     };
 
     // Update chart data for the selected year
@@ -456,10 +456,39 @@ export function HomeMainContent(_props: HomeMainContentProps) {
                                 <td className="border border-gray-500 px-4 py-2">{data.tax_amount}</td>
                                 <td className="border border-gray-500 px-4 py-2">{data.grand_total}</td>
                                 <td className="border border-gray-500 px-4 py-2">{data.transaction_description}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                {/* Pagination */}
+                <div className="mt-4 flex justify-between">
+                    {/* Export to CSV button */}
+                    <div>
+                        <button onClick={exportToCSV} className="rounded-full bg-sky-900 px-3 py-1 text-sm text-white hover:bg-sky-700">
+                            Export to CSV
+                        </button>
+                    </div>
+                    <div className="rounded-full bg-sky-900">
+                        <button
+                            className="rounded px-3 py-1 text-sm text-white"
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        >
+                            PREV
+                        </button>
+                        <span className="mx-4 text-sm text-white">
+                            Page {currentPage} of {filteredData ? Math.ceil((filteredData.length ?? 0) / transactionsPerPage) : 0}
+                        </span>
+                        <button
+                            className="rounded px-3 py-1 text-sm text-white"
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                            disabled={currentTransactions?.length !== transactionsPerPage}
+                        >
+                            NEXT
+                        </button>
+                    </div>
+                </div>
             </div>
             {/* Export to CSV button */}
             <div className="mt-4">

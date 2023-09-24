@@ -3,6 +3,34 @@ import axios from "axios";
 
 import { FilesContent } from "../../components/files/FilesContent";
 
+interface DataItem {
+  item_description: string;
+  item_quantity: string;
+  item_price: string;
+  item_total: string;
+  tax_amount: string;
+}
+
+interface Data {
+  bill_to: string;
+  items: DataItem[];
+  amount_due: string;
+  tax_amount: string;
+  bill_from: string;
+  invoice_number: string;
+  invoice_date: string;
+  grand_total: string;
+  transaction_description: string;
+}
+
+interface File {
+  _id: string;
+  fileName: string;
+  createdOn: string;
+  fileType: string;
+  data: Data;
+}
+
 export default function FilesPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<Error | null>(null);

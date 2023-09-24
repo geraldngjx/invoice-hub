@@ -43,6 +43,7 @@ export function FilesMainContent(props: FilesMainContentProps) {
   useEffect(() => {
     // When the files are fetched, set isLoading to false
     if (props.files) {
+      console.log(props.files);
       setIsLoading(false);
     }
   }, [props.files]);
@@ -161,7 +162,7 @@ export function FilesMainContent(props: FilesMainContentProps) {
                       Download
                     </button>
                   ) : (
-                    <span className="mr-4 text-lg text-gray-400">Processing Invoices</span>
+                    <span className="mr-4 text-center text-lg text-red-400">Failed</span>
                   )
                 }
                 <button

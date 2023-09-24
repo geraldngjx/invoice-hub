@@ -13,21 +13,36 @@ interface UploadMainContentProps {
 export function UploadMainContent(props: UploadMainContentProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string>(""); // State for file name input
+  const [uploading, setUploading] = useState<boolean>(false); // New state for upload progress
+  const [showPopup, setShowPopup] = useState<boolean>(false); // New state for displaying the popup
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     setSelectedFile(file || null); // Ensure it's not undefined
   };
 
-  const handleUploadClick = () => {
+  const handleUploadClick = async () => {
     if (selectedFile) {
-      console.log(selectedFile);
       if (fileName.trim() === "") {
-        toast.error("Please enter a file name."); // Validate file name
+        toast.error("Please enter a file name.");
       } else {
-        props.onFileUpload(selectedFile, fileName); // Pass file name to the function
-        setSelectedFile(null); // Clear the selected file after upload
-        setFileName(""); // Clear the file name input
+        setShowPopup(true); // Display the popup when uploading starts
+        setUploading(true); // Set uploading to true
+        try {
+          // Simulate the upload process (replace this with your actual upload logic)
+          await props.onFileUpload(selectedFile, fileName);
+          // Upload completed successfully
+          setSelectedFile(null);
+          setFileName("");
+          setShowPopup(false); // Hide the popup when uploading is done
+        } catch (error) {
+          // Handle any errors during the upload process
+          console.error("Error uploading file:", error);
+          toast.error("Upload failed.");
+          setShowPopup(false); // Hide the popup on error
+        } finally {
+          setUploading(false); // Set uploading to false
+        }
       }
     } else {
       toast.error("Please select a file to upload.");
@@ -82,6 +97,17 @@ export function UploadMainContent(props: UploadMainContentProps) {
           Upload
         </button>
       </div>
+      {/* Display the popup while uploading */}
+      {showPopup && (
+        <div className="fixed left-0 top-0 z-50 flex h-screen w-screen items-center justify-center bg-black bg-opacity-70">
+          <div className="rounded bg-white p-10 text-center shadow-lg">
+            <p className="text-lg font-semibold">Uploading in Progress</p>
+            <p className="text-sm text-gray-600">
+              Please do not leave this page.
+            </p>
+          </div>
+        </div>
+      )}
       <ToastContainer position="bottom-right" autoClose={3000} />
     </div>
   );

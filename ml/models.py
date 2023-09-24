@@ -111,7 +111,7 @@ class InvoiceDetails(BaseModel):
     """
     bill_from: Optional[str] = Field(..., description="The name of the company sending the invoice")
     bill_to: Optional[str] = Field(..., description="The name of the company receiving the invoice")
-    invoice_date: str = Field(..., description="The date the invoice was issued")
+    invoice_date: str = Field(..., description="The date the invoice was issued in the format MM/DD/YYYY")
     invoice_number: Optional[str] = Field(..., description="The invoice number")
     transaction_description: str = Field(..., description="A short summarised description of the transaction")
     amount_due: str = Field(..., description="The amount due on the invoice")

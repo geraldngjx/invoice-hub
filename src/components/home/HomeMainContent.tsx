@@ -1,6 +1,8 @@
 import React from "react";
 import Chart from "chart.js/auto";
 import { useRef, useState, useEffect } from "react";
+import excelJS from "exceljs";
+
 
 interface DataItem {
     item_description: string;
@@ -41,35 +43,79 @@ export function HomeMainContent(_props: HomeMainContentProps) {
     const [chartInstance, setChartInstance] = useState<Chart<"pie", number[], string> | null>(null);
 
 
-    const exportToCSV = () => {
-        let csvStr = "Bill To, Item Description, Quantity, Price, Total, Tax Amount, Amount Spent\n";
+    const exportToCSV = async () => {
+        const workbook = new excelJS.Workbook();
+
+        // Create INVOICES sheet
+        const invoicesSheet = workbook.addWorksheet("INVOICES");
+
+        // Define columns with a specific width
+        invoicesSheet.columns = [
+            { header: "Invoice Number", key: "invoice_number", width: 15 },
+            { header: "Date", key: "invoice_date", width: 10 },
+            { header: "Buyer", key: "bill_from", width: 15 },
+            { header: "Seller", key: "bill_to", width: 15 },
+            { header: "Amount", key: "amount_due", width: 10 },
+            { header: "Tax Amount", key: "tax_amount", width: 10 },
+            { header: "Total Spent", key: "grand_total", width: 12 },
+            { header: "Transaction description", key: "transaction_description", width: 25 },
+        ];
+
 
 
         _props.files.forEach((file) => {
+            invoicesSheet.addRow({
+                invoice_number: file.data.invoice_number,
+                invoice_date: file.data.invoice_date,
+                bill_from: file.data.bill_from,
+                bill_to: file.data.bill_to,
+                amount_due: file.data.amount_due,
+                tax_amount: file.data.tax_amount,
+                grand_total: file.data.grand_total,
+                transaction_description: file.data.transaction_description,
+            });
+        });
+        // Create TRANSACTIONS sheet
+        const transactionsSheet = workbook.addWorksheet("TRANSACTIONS");
+
+        // Define columns with a specific width
+        transactionsSheet.columns = [
+            { header: "Bill To", key: "bill_to", width: 15 },
+            { header: "Item Description", key: "item_description", width: 25 },
+            { header: "Quantity", key: "item_quantity", width: 10 },
+            { header: "Price", key: "item_price", width: 10 },
+            { header: "Total", key: "item_total", width: 10 },
+            { header: "Tax Amount", key: "tax_amount", width: 10 },
+            { header: "Amount Spent", key: "amount_due", width: 15 },
+        ];
+
+        _props.files.forEach((file) => {
             file.data.items.forEach((item) => {
-                const row = [
-                    file.data.bill_to,
-                    item.item_description,
-                    item.item_quantity,
-                    item.item_price,
-                    item.item_total,
-                    item.tax_amount,
-                    file.data.amount_due,
-                ];
-                csvStr += row.join(", ") + "\n";
+                transactionsSheet.addRow({
+                    bill_to: file.data.bill_to,
+                    item_description: item.item_description,
+                    item_quantity: item.item_quantity,
+                    item_price: item.item_price,
+                    item_total: item.item_total,
+                    tax_amount: item.tax_amount,
+                    amount_due: file.data.amount_due,
+                });
             });
         });
 
-        const blob = new Blob([csvStr], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", "transactions.csv");
-        link.style.visibility = "hidden";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // After creating and populating the workbook
+        workbook.xlsx.writeBuffer().then((buffer) => {
+            const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = "transactions.xlsx";
+            document.body.appendChild(link); // Required for Firefox
+            link.click();
+            document.body.removeChild(link);
+        });
+
     };
+
 
 
     // Combine all JSON data from different files into one array
@@ -123,22 +169,22 @@ export function HomeMainContent(_props: HomeMainContentProps) {
     // Calculate categories for inflow and outflow
 
     // Change mockData to allData
-    const inflowCategories = Array.from(
-        new Set(
-            mockData
-                .filter((item) => item.type === "inflow")
-                .map((item) => item.category)
-        )
-    );
+    // const inflowCategories = Array.from(
+    //     new Set(
+    //         mockData
+    //             .filter((item) => item.type === "inflow")
+    //             .map((item) => item.category)
+    //     )
+    // );
 
-    // Change mockData to allData
-    const outflowCategories = Array.from(
-        new Set(
-            mockData
-                .filter((item) => item.type === "outflow")
-                .map((item) => item.category)
-        )
-    );
+    // // Change mockData to allData
+    // const outflowCategories = Array.from(
+    //     new Set(
+    //         mockData
+    //             .filter((item) => item.type === "outflow")
+    //             .map((item) => item.category)
+    //     )
+    // );
 
     // Prepare data for the pie chart
     useEffect(() => {

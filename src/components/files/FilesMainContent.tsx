@@ -1,11 +1,25 @@
 import React, { useState } from "react";
 import { saveAs } from "file-saver";
 
+interface Data {
+  bill_to: string;
+  items: DataItem[];
+  amount_due: string;
+  tax_amount: string;
+  bill_from: string;
+  invoice_number: string;
+  invoice_date: string;
+  grand_total: string;
+  transaction_description: string;
+}
+
+
 interface File {
-  name: string;
+  _id: string;
+  fileName: string;
   createdOn: string;
-  type: string;
-  data: JSON[];
+  fileType: string;
+  data: Data;
 }
 
 interface FilesMainContentProps {
@@ -13,38 +27,42 @@ interface FilesMainContentProps {
   files: File[]; // Array of File objects
 }
 
+
+
 export function FilesMainContent(props: FilesMainContentProps) {
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const filteredFiles = props.files.filter((file) =>
-    file.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  console.log(props.files);
+
+  const filteredFiles = Array.isArray(props.files)
+    ? props.files.filter((file) => file.fileName?.toLowerCase().includes(searchTerm.toLowerCase()))
+    : [];
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
-  const convertDataToCSV = (jsonData: JSON[]) => {
-    const csvRows = [];
+  const convertDataToCSV = (fileData: Data) => {
+    const headers = [
+      "invoice_number",
+      "invoice_date",
+      "bill_from",
+      "bill_to",
+      "amount_due",
+      "tax_amount",
+      "grand_total",
+      "transaction_description",
+    ];
 
-    // Extract headers from the first object
-    const headers = Object.keys(jsonData[0]);
-    csvRows.push(headers.join(","));
-
-    // Loop through each JSON object and convert it to a CSV row
-    for (const row of jsonData) {
-      const values = headers.map((header: string) => row[header as keyof typeof row]);
-      csvRows.push(values.join(","));
-    }
-
-    return csvRows.join("\n");
+    const values = headers.map(header => fileData[header as keyof Data] || "");
+    return `${headers.join(",")}\n${values.join(",")}`;
   };
 
-  // Function to handle the download button click
+
   const handleDownloadClick = (file: File) => {
     const csvData = convertDataToCSV(file.data);
     const blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
-    saveAs(blob, `${file.name}.csv`);
+    saveAs(blob, `${file.fileName}.csv`);
   };
 
   return (
@@ -60,21 +78,20 @@ export function FilesMainContent(props: FilesMainContentProps) {
           value={searchTerm}
           onChange={handleSearchChange}
         />
-        {/* Display Filtered File List */}
         <ul className="mt-2">
-          {filteredFiles.map((file, index) => (
+          {filteredFiles.map((file) => (
             <li
-              key={index}
+              key={file._id}
               className="mb-2 flex items-center justify-between rounded-md bg-gray-700 p-4"
             >
               <div>
-                <p className=" text-lg font-semibold text-white">{file.name}</p>
-                <p className="text-sm text-gray-400">Type: {file.type}</p>
+                <p className="text-lg font-semibold text-white">{file.fileName}</p>
+                <p className="text-sm text-gray-400">Type: {file.fileType}</p>
                 <p className="text-sm text-gray-400">Created On: {file.createdOn}</p>
               </div>
               <div>
                 <button
-                  onClick={() => handleDownloadClick(file)} // Call the download function with the file data
+                  onClick={() => handleDownloadClick(file)}
                   className="mr-4 text-lg text-blue-500 hover:text-blue-700"
                 >
                   Download

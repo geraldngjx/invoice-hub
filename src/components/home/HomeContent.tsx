@@ -18,6 +18,12 @@ interface Data {
     bill_to: string;
     items: DataItem[];
     amount_due: string;
+    tax_amount: string;
+    bill_from: string;
+    invoice_number: string;
+    invoice_date: string;
+    grand_total: string;
+    transaction_description: string;
 }
 
 interface DataItem {

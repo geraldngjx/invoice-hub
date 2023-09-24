@@ -36,7 +36,7 @@ export function UploadContent(props: ContentProps) {
       if (result) {
         console.log("This is result: ", result);
         // Extract fileType from fileName
-        const fileType = fileName.split(".").pop()?.toUpperCase() || "UNKNOWN";
+        const fileType = result.fileType || fileName.split(".").pop()?.toUpperCase() || "UNKNOWN";
 
         // Format data to be saved to MongoDB
         const dataToSave = result.map((doc: any) => ({

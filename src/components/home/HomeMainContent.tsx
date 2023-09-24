@@ -135,7 +135,12 @@ export function HomeMainContent(_props: HomeMainContentProps) {
     };
 
     // Combine all JSON data from different files into one array
-    const allData = _props.files.flatMap((file) => file.data);
+    const allData = _props.files.flatMap((file) => {
+        file.data.tax_amount = file.data.tax_amount.replace(/,/g, ""); // Remove commas from tax_amount
+        file.data.grand_total = file.data.grand_total.replace(/,/g, ""); // Remove commas from grand_total
+        file.data.amount_due = file.data.amount_due.replace(/,/g, "");
+        return file.data;
+    });
 
     /*
     Functions to calculate statistics for the filtered data (NUMERICAL)
@@ -145,13 +150,31 @@ export function HomeMainContent(_props: HomeMainContentProps) {
     const getUniqueMonthsAndYears = (data: Data[]): string[] => {
         const uniqueDates = new Set();
         data.forEach((item) => {
-            const date = new Date(item.invoice_date);
-            const year = date.getFullYear();
-            const month = date.getMonth() + 1; // Months are 0-indexed, so add 1
+          const date = new Date(item.invoice_date);
+          const year = date.getFullYear();
+          const month = date.getMonth() + 1; // Months are 0-indexed, so add 1
+          if (!Number.isNaN(year) && !Number.isNaN(month)) {
             uniqueDates.add(`${year}-${month}`);
+          }
         });
-        return Array.from(uniqueDates).sort() as string[];
-    };
+      
+        // Convert unique dates to an array and sort it
+        const sortedUniqueDates = (Array.from(uniqueDates) as string[]).sort((a: string, b: string) => {
+          // Split the date strings into year and month
+          const [yearA, monthA] = a.split("-");
+          const [yearB, monthB] = b.split("-");
+      
+          // Compare years first
+          if (yearA !== yearB) {
+            return Number(yearA) - Number(yearB);
+          }
+      
+          // If years are the same, compare months
+          return Number(monthA) - Number(monthB);
+        }) as string[];
+      
+        return sortedUniqueDates;
+      };
 
     // Function to get the name of a month from its number (1-12)
     const getMonthName = (monthNumber: number) => {
@@ -167,18 +190,18 @@ export function HomeMainContent(_props: HomeMainContentProps) {
         if (type === "outflow") {
             // Calculate the total outflow (sum of grand_total) and truncate to 2 decimal places
             return data.reduce((total, item) => {
-                return total + parseFloat(item.grand_total);
+                const grandTotal = parseFloat(item.grand_total.replace("$", "").replace(",","").trim());
+                return total + grandTotal;
             }, 0).toFixed(2);
         } else if (type === "tax_amount") {
             // Calculate the total tax (sum of tax_amount) and truncate to 2 decimal places
             return data.reduce((total, item) => {
-                return total + parseFloat(item.tax_amount);
+                const taxAmount = parseFloat(item.tax_amount.replace("$", "").replace(",","").trim());
+                return total + taxAmount;
             }, 0).toFixed(2);
         } else if (type === "invoice_count") {
             // Calculate the number of invoices (count of Data_Item in every File object)
-            return data.reduce((count, item) => {
-                return count + item.items.length;
-            }, 0).toString();
+            return data.length.toString();
         } else {
             // Handle other types if needed
             return "0";
@@ -248,9 +271,9 @@ export function HomeMainContent(_props: HomeMainContentProps) {
             // Check if the data is from the selected year
             if (year === selectedYear) {
                 // Update monthly data
-                totalOutflows[month] += parseFloat(item.grand_total);
-                totalTaxes[month] += parseFloat(item.tax_amount);
-                invoiceCounts[month] += item.items.length;
+                totalOutflows[month] += parseFloat(item.grand_total.replace("$", "").replace(",","").trim());
+                totalTaxes[month] += parseFloat(item.tax_amount.replace("$", "").replace(",","").trim());
+                invoiceCounts[month] += 1;
             }
         });
 
@@ -266,7 +289,9 @@ export function HomeMainContent(_props: HomeMainContentProps) {
         data.forEach((item) => {
             const date = new Date(item.invoice_date);
             const year = date.getFullYear();
-            uniqueYears.add(year);
+            if (!Number.isNaN(year)) {
+                uniqueYears.add(year);
+            }
         });
         return Array.from(uniqueYears).sort() as string[];
     };
@@ -480,12 +505,12 @@ export function HomeMainContent(_props: HomeMainContentProps) {
                     {/* Export to CSV button */}
                     <div>
                         <button onClick={exportToCSV} className="rounded-full bg-sky-900 px-3 py-1 text-sm text-white hover:bg-sky-700">
-                            Export to CSV
+                            Export Entire Database to CSV
                         </button>
                     </div>
                     <div className="rounded-full bg-sky-900">
                         <button
-                            className="rounded px-3 py-1 text-sm text-white"
+                            className="rounded-full px-3 py-1 text-sm text-white transition-all duration-300 hover:bg-sky-700"
                             onClick={() => setCurrentPage(currentPage - 1)}
                             disabled={currentPage === 1}
                         >
@@ -495,7 +520,7 @@ export function HomeMainContent(_props: HomeMainContentProps) {
                             Page {currentPage} of {filteredData ? Math.ceil((filteredData.length ?? 0) / transactionsPerPage) : 0}
                         </span>
                         <button
-                            className="rounded px-3 py-1 text-sm text-white"
+                            className="rounded-full px-3 py-1 text-sm text-white transition-all duration-300 hover:bg-sky-700"
                             onClick={() => setCurrentPage(currentPage + 1)}
                             disabled={currentTransactions?.length !== transactionsPerPage}
                         >

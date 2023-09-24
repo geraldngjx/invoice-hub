@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { saveAs } from "file-saver";
+import ExcelJS from "exceljs";
+
 
 interface Data {
   bill_to: string;
@@ -43,27 +45,79 @@ export function FilesMainContent(props: FilesMainContentProps) {
     setSearchTerm(e.target.value);
   };
 
-  const convertDataToCSV = (fileData: Data) => {
-    const headers = [
-      "invoice_number",
-      "invoice_date",
-      "bill_from",
-      "bill_to",
-      "amount_due",
-      "tax_amount",
-      "grand_total",
-      "transaction_description",
+  // const convertDataToCSV = (fileData: Data) => {
+  //   const headers = [
+  //     "invoice_number",
+  //     "invoice_date",
+  //     "bill_from",
+  //     "bill_to",
+  //     "amount_due",
+  //     "tax_amount",
+  //     "grand_total",
+  //     "transaction_description",
+  //   ];
+
+  //   const values = headers.map(header => fileData[header as keyof Data] || "");
+  //   return `${headers.join(",")}\n${values.join(",")}`;
+  // };
+
+  const createWorkbookFromFiles = (files) => {
+    console.log(files);
+    const workbook = new ExcelJS.Workbook();
+
+    // Create INVOICES sheet
+    const invoicesSheet = workbook.addWorksheet("INVOICES");
+
+    // Define columns with a specific width
+    invoicesSheet.columns = [
+      { header: "Invoice Number", key: "invoice_number", width: 15 },
+      { header: "Date", key: "invoice_date", width: 10 },
+      { header: "Buyer", key: "bill_from", width: 15 },
+      { header: "Seller", key: "bill_to", width: 15 },
+      { header: "Amount", key: "amount_due", width: 10 },
+      { header: "Tax Amount", key: "tax_amount", width: 10 },
+      { header: "Total Spent", key: "grand_total", width: 12 },
+      { header: "Transaction description", key: "transaction_description", width: 25 },
     ];
 
-    const values = headers.map(header => fileData[header as keyof Data] || "");
-    return `${headers.join(",")}\n${values.join(",")}`;
+    // Loop through each InvoiceCollection document
+    files.invoices.forEach((invoice) => {
+      const invoiceData = invoice.data;
+      // Loop through each invoice in the invoices array of the InvoiceCollection document
+      // file.invoices.forEach((invoice) => {
+      // Add each invoice as a row to the worksheet
+      invoicesSheet.addRow({
+        invoice_number: invoiceData.invoice_number,
+        invoice_date: invoiceData.invoice_date,
+        bill_from: invoiceData.bill_from,
+        bill_to: invoiceData.bill_to,
+        amount_due: invoiceData.amount_due,
+        tax_amount: invoiceData.tax_amount,
+        grand_total: invoiceData.grand_total,
+        transaction_description: invoiceData.transaction_description,
+        // });
+      });
+    });
+
+    // After creating and populating the workbook
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = "invoices.xlsx"; // You can modify the name of the downloaded file here
+      document.body.appendChild(link); // Required for Firefox
+      link.click();
+      document.body.removeChild(link);
+    });
   };
 
 
+
   const handleDownloadClick = (file: File) => {
-    const csvData = convertDataToCSV(file.data);
-    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
-    saveAs(blob, `${file.fileName}.csv`);
+    // console.log(file);
+    createWorkbookFromFiles(file);
+    // const blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
+    // saveAs(blob, `${file.fileName}.xlsx`);
   };
 
   return (

@@ -41,7 +41,6 @@ export function HomeContent(props: HomeContentProps) {
         const fetchData = async () => {
             try {
                 const response = await fetch("/api/fetchAllFiles"); // Updated API route
-                console.log(response);
                 if (response.status !== 200) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

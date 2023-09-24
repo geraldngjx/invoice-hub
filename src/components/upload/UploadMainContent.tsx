@@ -30,7 +30,7 @@ export function UploadMainContent(props: UploadMainContentProps) {
         setUploading(true); // Set uploading to true
         try {
           // Simulate the upload process (replace this with your actual upload logic)
-          await props.onFileUpload(selectedFile, fileName);
+          props.onFileUpload(selectedFile, fileName);
           // Upload completed successfully
           setSelectedFile(null);
           setFileName("");

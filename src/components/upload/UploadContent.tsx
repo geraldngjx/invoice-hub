@@ -17,9 +17,14 @@ export function UploadContent(props: ContentProps) {
       });
   
       // Create a FormData object to send the file
+
       const formData = new FormData();
       formData.append("sampleFile", file, fileName); // use fileName here if needed
-  
+
+
+      //pre-create InvoiceCollection Object
+      const initialResponse = await axios.post("/api/invoiceCollections", { fileName, invoices: [] });
+      if (!initialResponse.data.success) throw new Error("Initial save failed");
       // Send a POST request to the server
       const response = await fetch("/api/parseInvoice", {
         method: "POST",
@@ -77,7 +82,7 @@ export function UploadContent(props: ContentProps) {
       console.log("All individual invoices have been saved successfully.");
   
       // 2. Save the collection of invoices in one Document
-      const collectionSaveResponse = await axios.post("/api/invoiceCollections", { invoices: obj, fileName });
+      const collectionSaveResponse = await axios.put("/api/invoiceCollections", { invoices: obj, fileName });
       console.log("Invoice collection has been saved successfully:", collectionSaveResponse.data);
     } catch (error) {
       console.error("Error saving data:", error);

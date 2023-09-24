@@ -26,6 +26,7 @@ interface Data {
 interface File {
   _id: string;
   fileName: string;
+  invoices: any[];
   createdOn: string;
   fileType: string;
   data: Data;
@@ -35,10 +36,12 @@ export default function FilesPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<Error | null>(null);
 
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("/api/fetchZipFiles"); // Use a relative URL here
+        const response = await axios.get("/api/fetchZipFiles");
         if (response.status !== 200) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

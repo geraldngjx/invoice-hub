@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ExcelJS from "exceljs";
+import axios from "axios";
 
 interface DataItem {
   item_description: string;
@@ -21,10 +22,10 @@ interface Data {
   transaction_description: string;
 }
 
-
 interface File {
   _id: string;
   fileName: string;
+  invoices: any[];
   createdOn: string;
   fileType: string;
   data: Data;
@@ -34,8 +35,6 @@ interface FilesMainContentProps {
   title: string;
   files: File[]; // Array of File objects
 }
-
-
 
 export function FilesMainContent(props: FilesMainContentProps) {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -49,30 +48,14 @@ export function FilesMainContent(props: FilesMainContentProps) {
   }, [props.files]);
 
   const filteredFiles = Array.isArray(props.files)
-    ? props.files.filter((file) => file.fileName?.toLowerCase().includes(searchTerm.toLowerCase()))
+    ? props.files.filter((file) =>
+      file.fileName?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : [];
-
-  console.log(filteredFiles);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
-
-  // const convertDataToCSV = (fileData: Data) => {
-  //   const headers = [
-  //     "invoice_number",
-  //     "invoice_date",
-  //     "bill_from",
-  //     "bill_to",
-  //     "amount_due",
-  //     "tax_amount",
-  //     "grand_total",
-  //     "transaction_description",
-  //   ];
-
-  //   const values = headers.map(header => fileData[header as keyof Data] || "");
-  //   return `${headers.join(",")}\n${values.join(",")}`;
-  // };
 
   const createWorkbookFromFiles = (files : any) => {
     console.log(files);
@@ -90,7 +73,11 @@ export function FilesMainContent(props: FilesMainContentProps) {
       { header: "Amount", key: "amount_due", width: 10 },
       { header: "Tax Amount", key: "tax_amount", width: 10 },
       { header: "Total Spent", key: "grand_total", width: 12 },
-      { header: "Transaction description", key: "transaction_description", width: 25 },
+      {
+        header: "Transaction description",
+        key: "transaction_description",
+        width: 25,
+      },
     ];
 
     // Loop through each InvoiceCollection document
@@ -114,7 +101,9 @@ export function FilesMainContent(props: FilesMainContentProps) {
 
     // After creating and populating the workbook
     workbook.xlsx.writeBuffer().then((buffer) => {
-      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
       const link = document.createElement("a");
       link.href = window.URL.createObjectURL(blob);
       link.download = "invoices.xlsx"; // You can modify the name of the downloaded file here
@@ -124,13 +113,17 @@ export function FilesMainContent(props: FilesMainContentProps) {
     });
   };
 
-
+  const handleDeleteClick = async (file: File) => {
+    try {
+      await axios.delete(`/api/invoiceCollections?fileName=${file.fileName}`);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting the file:", error);
+    }
+  };
 
   const handleDownloadClick = (file: File) => {
-    // console.log(file);
     createWorkbookFromFiles(file);
-    // const blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
-    // saveAs(blob, `${file.fileName}.xlsx`);
   };
 
   return (
@@ -162,13 +155,21 @@ export function FilesMainContent(props: FilesMainContentProps) {
                 <p className="text-sm text-gray-400">Created On: {file.createdOn}</p>
               </div>
               <div>
+                {
+                  (file.invoices.length > 0) ? (
+                    <button onClick={() => handleDownloadClick(file)} className="mr-4 text-lg text-blue-500 hover:text-blue-700">
+                      Download
+                    </button>
+                  ) : (
+                    <span className="mr-4 text-lg text-gray-400">Processing Invoices</span>
+                  )
+                }
                 <button
-                  onClick={() => handleDownloadClick(file)}
-                  className="mr-4 text-sm text-blue-500 hover:text-blue-700"
+                  onClick={() => handleDeleteClick(file)}
+                  className="mr-2 text-lg text-red-500 hover:text-red-700"
                 >
-                  Download
+                  Delete
                 </button>
-                <button className="mr-2 text-sm text-red-500 hover:text-red-700">Delete</button>
               </div>
             </li>
           ))}

@@ -21,6 +21,7 @@ export function UploadMainContent(props: UploadMainContentProps) {
 
   const handleUploadClick = () => {
     if (selectedFile) {
+      console.log(selectedFile);
       if (fileName.trim() === "") {
         toast.error("Please enter a file name."); // Validate file name
       } else {
@@ -49,6 +50,7 @@ export function UploadMainContent(props: UploadMainContentProps) {
             <input
               id="fileInput"
               type="file"
+              name="sampleFile" // <-- Add this line
               accept=".zip"
               onChange={handleFileChange}
               className="mb-10 hidden"

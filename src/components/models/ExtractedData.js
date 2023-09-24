@@ -7,7 +7,6 @@ const DataSchema = new Schema({
   createdOn: Date,
   fileType: {
     type: String,
-    enum: ["PDF", "PPT", "XLS", "JPG"],
   },
 });
 

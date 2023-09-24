@@ -2,20 +2,75 @@ import React from "react";
 import Chart from "chart.js/auto";
 import { useRef, useState, useEffect } from "react";
 
+interface DataItem {
+    item_description: string;
+    item_quantity: string;
+    item_price: string;
+    item_total: string;
+    tax_amount: string;
+}
+
+interface Data {
+    bill_to: string;
+    items: DataItem[];
+    amount_due: string;
+    tax_amount: string;
+    bill_from: string;
+    invoice_number: string;
+    invoice_date: string;
+    grand_total: string;
+    transaction_description: string;
+}
+
 interface File {
     name: string;
     createdOn: string;
     type: string;
-    data: JSON[];
+    data: Data; // Changed from JSON[] to Data
 }
 
 interface HomeMainContentProps {
     files: File[]; // Array of File objects, each containing JSON data
 }
 
+
+
+
 export function HomeMainContent(_props: HomeMainContentProps) {
     const canvas = useRef<HTMLCanvasElement>(null);
     const [chartInstance, setChartInstance] = useState<Chart<"pie", number[], string> | null>(null);
+
+
+    const exportToCSV = () => {
+        let csvStr = "Bill To, Item Description, Quantity, Price, Total, Tax Amount, Amount Spent\n";
+
+
+        _props.files.forEach((file) => {
+            file.data.items.forEach((item) => {
+                const row = [
+                    file.data.bill_to,
+                    item.item_description,
+                    item.item_quantity,
+                    item.item_price,
+                    item.item_total,
+                    item.tax_amount,
+                    file.data.amount_due,
+                ];
+                csvStr += row.join(", ") + "\n";
+            });
+        });
+
+        const blob = new Blob([csvStr], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "transactions.csv");
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
 
     // Combine all JSON data from different files into one array
     // const allData = props.files.flatMap((file) => file.data);
@@ -88,11 +143,11 @@ export function HomeMainContent(_props: HomeMainContentProps) {
     // Prepare data for the pie chart
     useEffect(() => {
         const ctx = canvas.current;
-    
+
         if (chartInstance) {
             chartInstance.destroy();
         }
-    
+
         const chart = new Chart(ctx!, {
             type: "pie",
             data: {
@@ -126,7 +181,7 @@ export function HomeMainContent(_props: HomeMainContentProps) {
             },
         });
         setChartInstance(chart);
-    
+
         // Destroy the chart when the component unmounts
         return () => {
             chart.destroy();
@@ -161,7 +216,7 @@ export function HomeMainContent(_props: HomeMainContentProps) {
                     </div>
                 </div>
             </div>
-            <h2 className="mt-10 border-t border-gray-700 pb-5 pt-10 text-center text-2xl text-white">Categories</h2>
+            {/* <h2 className="mt-10 border-t border-gray-700 pb-5 pt-10 text-center text-2xl text-white">Categories</h2>
             <div className="w-full p-4">
                 <div className="flex w-full">
                     <div className="w-1/2">
@@ -197,7 +252,48 @@ export function HomeMainContent(_props: HomeMainContentProps) {
                         </table>
                     </div>
                 </div>
+            </div> */}
+
+            <h2 className="mt-10 border-t border-gray-700 pb-5 pt-10 text-center text-2xl text-white">Transactions</h2>
+            <div className="flex flex-wrap justify-center">
+                <table className="w-full border-collapse bg-gray-700 text-white">
+                    <thead>
+                        <tr>
+                            <th className="border border-gray-500 px-4 py-2">Invoice Number</th>
+                            <th className="border border-gray-500 px-4 py-2">Date</th>
+                            <th className="border border-gray-500 px-4 py-2">Buyer</th>
+                            <th className="border border-gray-500 px-4 py-2">Seller</th>
+                            <th className="border border-gray-500 px-4 py-2">Amount</th>
+                            <th className="border border-gray-500 px-4 py-2">Tax Amount</th>
+                            <th className="border border-gray-500 px-4 py-2">Total Spent</th>
+                            <th className="border border-gray-500 px-4 py-2">Transaction description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {Array.isArray(_props.files) && _props.files.map((file, index) => (
+                            <tr key={index}>
+                                <td className="border border-gray-500 px-4 py-2">{file.data.invoice_number}</td>
+                                <td className="border border-gray-500 px-4 py-2">{file.data.invoice_date}</td>
+                                <td className="border border-gray-500 px-4 py-2">{file.data.bill_from}</td>
+                                <td className="border border-gray-500 px-4 py-2">{file.data.bill_to}</td>
+                                <td className="border border-gray-500 px-4 py-2">{file.data.amount_due}</td>
+                                <td className="border border-gray-500 px-4 py-2">{file.data.tax_amount}</td>
+                                <td className="border border-gray-500 px-4 py-2">{file.data.grand_total}</td>
+                                <td className="border border-gray-500 px-4 py-2">{file.data.transaction_description}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <div className="mt-4">
+                <button onClick={exportToCSV} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Export to CSV
+                </button>
             </div>
         </div>
     );
 }
+
+
+
+

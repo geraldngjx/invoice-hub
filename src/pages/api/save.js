@@ -1,10 +1,16 @@
 import Data from "../../components/models/ExtractedData";
 
-export default async function handler(req, res) {
+export default async function save(req, res) {
   if (req.method === "POST") {
     try {
-      const data = new Data(req.body);
-      await data.save();
+      const dataArray = Array.isArray(req.body) ? req.body : [req.body]; // Ensure it is an array
+
+      // Filter out objects where success is false
+      const validDataArray = dataArray.filter(
+        (item) => item.data.success !== false
+      );
+
+      await Data.insertMany(validDataArray); // Use insertMany to save all valid documents in the dataArray
 
       return res
         .status(200)

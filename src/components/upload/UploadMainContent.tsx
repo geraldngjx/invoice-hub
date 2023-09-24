@@ -51,7 +51,7 @@ export function UploadMainContent(props: UploadMainContentProps) {
               id="fileInput"
               type="file"
               name="sampleFile" // <-- Add this line
-              accept=".zip"
+              accept=".zip,.pdf,image/*"
               onChange={handleFileChange}
               className="mb-10 hidden"
             />

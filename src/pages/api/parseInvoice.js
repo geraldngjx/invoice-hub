@@ -66,10 +66,10 @@ export default async function parseInvoice(req, res) {
 
       const results = await processEntriesInBatches(zipEntries);
 
-      //   const successfulResults = results.filter(
-      //     (result) => result.success !== false
-      //   );
-      const successfulResults = results;
+      const successfulResults = results.filter(
+        (result) => result.success !== false
+      );
+      // const successfulResults = results;
 
       return res.status(200).json(successfulResults);
     } catch (error) {

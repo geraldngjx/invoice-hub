@@ -1,11 +1,27 @@
 import React, { useState } from "react";
 import { saveAs } from "file-saver";
+import ExcelJS from "exceljs";
+
+
+interface Data {
+  bill_to: string;
+  items: DataItem[];
+  amount_due: string;
+  tax_amount: string;
+  bill_from: string;
+  invoice_number: string;
+  invoice_date: string;
+  grand_total: string;
+  transaction_description: string;
+}
+
 
 interface File {
-  name: string;
+  _id: string;
+  fileName: string;
   createdOn: string;
-  type: string;
-  data: JSON[];
+  fileType: string;
+  data: Data;
 }
 
 interface FilesMainContentProps {
@@ -13,38 +29,95 @@ interface FilesMainContentProps {
   files: File[]; // Array of File objects
 }
 
+
+
 export function FilesMainContent(props: FilesMainContentProps) {
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const filteredFiles = props.files.filter((file) =>
-    file.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  console.log(props);
+  const filteredFiles = Array.isArray(props.files)
+    ? props.files.filter((file) => file.fileName?.toLowerCase().includes(searchTerm.toLowerCase()))
+    : [];
+
+  console.log(filteredFiles);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
-  const convertDataToCSV = (jsonData: JSON[]) => {
-    const csvRows = [];
+  // const convertDataToCSV = (fileData: Data) => {
+  //   const headers = [
+  //     "invoice_number",
+  //     "invoice_date",
+  //     "bill_from",
+  //     "bill_to",
+  //     "amount_due",
+  //     "tax_amount",
+  //     "grand_total",
+  //     "transaction_description",
+  //   ];
 
-    // Extract headers from the first object
-    const headers = Object.keys(jsonData[0]);
-    csvRows.push(headers.join(","));
+  //   const values = headers.map(header => fileData[header as keyof Data] || "");
+  //   return `${headers.join(",")}\n${values.join(",")}`;
+  // };
 
-    // Loop through each JSON object and convert it to a CSV row
-    for (const row of jsonData) {
-      const values = headers.map((header: string) => row[header as keyof typeof row]);
-      csvRows.push(values.join(","));
-    }
+  const createWorkbookFromFiles = (files) => {
+    console.log(files);
+    const workbook = new ExcelJS.Workbook();
 
-    return csvRows.join("\n");
+    // Create INVOICES sheet
+    const invoicesSheet = workbook.addWorksheet("INVOICES");
+
+    // Define columns with a specific width
+    invoicesSheet.columns = [
+      { header: "Invoice Number", key: "invoice_number", width: 15 },
+      { header: "Date", key: "invoice_date", width: 10 },
+      { header: "Buyer", key: "bill_from", width: 15 },
+      { header: "Seller", key: "bill_to", width: 15 },
+      { header: "Amount", key: "amount_due", width: 10 },
+      { header: "Tax Amount", key: "tax_amount", width: 10 },
+      { header: "Total Spent", key: "grand_total", width: 12 },
+      { header: "Transaction description", key: "transaction_description", width: 25 },
+    ];
+
+    // Loop through each InvoiceCollection document
+    files.invoices.forEach((invoice) => {
+      const invoiceData = invoice.data;
+      // Loop through each invoice in the invoices array of the InvoiceCollection document
+      // file.invoices.forEach((invoice) => {
+      // Add each invoice as a row to the worksheet
+      invoicesSheet.addRow({
+        invoice_number: invoiceData.invoice_number,
+        invoice_date: invoiceData.invoice_date,
+        bill_from: invoiceData.bill_from,
+        bill_to: invoiceData.bill_to,
+        amount_due: invoiceData.amount_due,
+        tax_amount: invoiceData.tax_amount,
+        grand_total: invoiceData.grand_total,
+        transaction_description: invoiceData.transaction_description,
+        // });
+      });
+    });
+
+    // After creating and populating the workbook
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = "invoices.xlsx"; // You can modify the name of the downloaded file here
+      document.body.appendChild(link); // Required for Firefox
+      link.click();
+      document.body.removeChild(link);
+    });
   };
 
-  // Function to handle the download button click
+
+
   const handleDownloadClick = (file: File) => {
-    const csvData = convertDataToCSV(file.data);
-    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
-    saveAs(blob, `${file.name}.csv`);
+    // console.log(file);
+    createWorkbookFromFiles(file);
+    // const blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
+    // saveAs(blob, `${file.fileName}.xlsx`);
   };
 
   return (
@@ -60,21 +133,20 @@ export function FilesMainContent(props: FilesMainContentProps) {
           value={searchTerm}
           onChange={handleSearchChange}
         />
-        {/* Display Filtered File List */}
         <ul className="mt-2">
-          {filteredFiles.map((file, index) => (
+          {filteredFiles.map((file) => (
             <li
-              key={index}
+              key={file._id}
               className="mb-2 flex items-center justify-between rounded-md bg-gray-700 p-4"
             >
               <div>
-                <p className=" text-lg font-semibold text-white">{file.name}</p>
-                <p className="text-sm text-gray-400">Type: {file.type}</p>
+                <p className="text-lg font-semibold text-white">{file.fileName}</p>
+                <p className="text-sm text-gray-400">Type: {file.fileType}</p>
                 <p className="text-sm text-gray-400">Created On: {file.createdOn}</p>
               </div>
               <div>
                 <button
-                  onClick={() => handleDownloadClick(file)} // Call the download function with the file data
+                  onClick={() => handleDownloadClick(file)}
                   className="mr-4 text-lg text-blue-500 hover:text-blue-700"
                 >
                   Download

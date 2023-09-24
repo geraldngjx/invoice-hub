@@ -3,7 +3,7 @@ import { FilesMainContent } from "./FilesMainContent";
 
 interface ContentProps {
   title: string;
-  files: File[]; // Array of File objects
+  files: File[];
 }
 
 export function FilesContent(props: ContentProps) {
@@ -20,7 +20,9 @@ export function FilesContent(props: ContentProps) {
     },
     [Symbol.toStringTag]: "Object",
   };
+  const files = props;
 
+  // console.log(files);
   // Mock data for testing
   const mockFiles = [
     {
@@ -75,7 +77,7 @@ export function FilesContent(props: ContentProps) {
 
   return (
     <div className="flex h-full flex-wrap">
-      <FilesMainContent title={props.title} files={mockFiles}/>
+      <FilesMainContent title={props.title} files={files.files} />
       <SidePanel />
     </div>
   );

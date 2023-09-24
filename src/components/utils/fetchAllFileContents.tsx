@@ -1,21 +1,44 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
-import { FilesContent } from "../../components/files/FilesContent";
+interface DataItem {
+  item_description: string;
+  item_quantity: string;
+  item_price: string;
+  item_total: string;
+  tax_amount: string;
+}
 
-export default function FilesPage() {
+interface Data {
+  bill_to: string;
+  items: DataItem[];
+  amount_due: string;
+  tax_amount: string;
+  bill_from: string;
+  invoice_number: string;
+  invoice_date: string;
+  grand_total: string;
+  transaction_description: string;
+}
 
+interface File {
+  name: string;
+  createdOn: string;
+  type: string;
+  data: Data;
+}
+
+export function useFetchAllFileContents() {
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/fetchZipFiles");
+        const response = await axios.get("http://localhost:3000/api/fetchAllFiles");
         if (response.status !== 200) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        console.log(response.data.data);
         setFiles(response.data.data);
       } catch (error: any) {
         if (error instanceof Error) {
@@ -28,5 +51,7 @@ export default function FilesPage() {
     };
     fetchData();
   }, []);
-  return <FilesContent title="Files" files={files} />;
+
+  return { files, error };
 }
+

@@ -4,8 +4,6 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
-// import ExtractedData from "../models/ExtractedData";
-
 interface ContentProps {
   title: string;
 }
@@ -36,7 +34,7 @@ export function UploadContent(props: ContentProps) {
       if (result) {
         console.log("This is result: ", result);
         // Extract fileType from fileName
-        const fileType = fileName.split(".").pop()?.toUpperCase() || "UNKNOWN";
+        const fileType = result.fileType || fileName.split(".").pop()?.toUpperCase() || "UNKNOWN";
 
         // Format data to be saved to MongoDB
         const dataToSave = result.map((doc: any) => ({
@@ -47,7 +45,7 @@ export function UploadContent(props: ContentProps) {
         }));
 
         // Save the formatted data to MongoDB
-        saveToMongoDB(dataToSave);
+        saveToMongoDB(dataToSave, fileName);
         // Indicate successful upload
         console.log("Upload successful");
         toast.success("Upload Successful");
@@ -65,27 +63,23 @@ export function UploadContent(props: ContentProps) {
  * Save an object to MongoDB
  * @param {Object} obj - The object to be saved
  */
-  async function saveToMongoDB(obj: any) {
-    console.log(obj);
-    console.log("testing");
-    axios.post("http://localhost:3000/api/save", obj) // TODO: adjust the URL later
-      .then(response => {
-        console.log("Data saved successfully:", response.data);
-      })
-      .catch(error => {
-        console.error("Error saving data:", error);
-      });
+  async function saveToMongoDB(obj: any, fileName: string) {
+    try {
+      // 1. Save each individual invoice
+      const individualSavePromises = obj.map((invoice: any) =>
+        axios.post("http://localhost:3000/api/save", invoice)
+      );
+
+      await Promise.all(individualSavePromises);
+      console.log("All individual invoices have been saved successfully.");
+
+      // 2. Save the collection of invoices in one Document
+      const collectionSaveResponse = await axios.post("http://localhost:3000/api/invoiceCollections", { invoices: obj, fileName });
+      console.log("Invoice collection has been saved successfully:", collectionSaveResponse.data);
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
   }
-
-  // // testData
-  // const testData = new ExtractedData({
-  //   data: { key: "value" },
-  //   fileName: "someFile.pdf",
-  //   createdOn: new Date(),
-  //   fileType: "PDF",
-  // });
-
-  // saveToMongoDB(testData);
 
   return (
     <div className="flex flex-wrap">

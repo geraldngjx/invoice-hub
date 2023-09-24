@@ -97,8 +97,8 @@ export function TopBar() {
             </a>
             <a href="#" className="relative block">
               <img
-                alt="Maurice Lokumba"
-                src="/images/1.jpg"
+                alt="Profile"
+                src="/images/1.png"
                 className="mx-auto h-10 w-10 rounded-full object-cover"
               />
             </a>

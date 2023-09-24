@@ -32,11 +32,12 @@ interface FilesMainContentProps {
 export function FilesMainContent(props: FilesMainContentProps) {
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  console.log(props.files);
-
+  console.log(props);
   const filteredFiles = Array.isArray(props.files)
     ? props.files.filter((file) => file.fileName?.toLowerCase().includes(searchTerm.toLowerCase()))
     : [];
+
+  console.log(filteredFiles);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);

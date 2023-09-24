@@ -128,8 +128,6 @@ export function HomeMainContent(_props: HomeMainContentProps) {
 
     };
 
-
-
     // Combine all JSON data from different files into one array
     const allData = _props.files.flatMap((file) => file.data);
 
@@ -467,43 +465,6 @@ export function HomeMainContent(_props: HomeMainContentProps) {
     );
 }
 
-{/* <h2 className="mt-10 border-t border-gray-700 pb-5 pt-10 text-center text-2xl text-white">Categories</h2>
-            <div className="w-full p-4">
-                <div className="flex w-full">
-                    <div className="w-1/2">
-                        <table className="w-full border-collapse bg-gray-700 text-white">
-                            <thead>
-                                <tr>
-                                    <th className="border border-gray-500 px-4 py-2">Inflow</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {inflowCategories.map((category, index) => (
-                                    <tr key={index}>
-                                        <td className="border border-gray-500 px-4 py-2">{category}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className="w-1/2">
-                        <table className="w-full border-collapse bg-gray-700 text-white">
-                            <thead>
-                                <tr>
-                                    <th className="border border-gray-500 px-4 py-2">Outflow</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {outflowCategories.map((category, index) => (
-                                    <tr key={index}>
-                                        <td className="border border-gray-500 px-4 py-2">{category}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div> */}
 
 
 

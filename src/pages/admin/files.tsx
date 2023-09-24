@@ -4,14 +4,13 @@ import axios from "axios";
 import { FilesContent } from "../../components/files/FilesContent";
 
 export default function FilesPage() {
-
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/fetchZipFiles");
+        const response = await axios.get("/api/fetchZipFiles"); // Use a relative URL here
         if (response.status !== 200) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -28,5 +27,6 @@ export default function FilesPage() {
     };
     fetchData();
   }, []);
+
   return <FilesContent title="Files" files={files} />;
 }

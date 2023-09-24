@@ -13,7 +13,7 @@ export default function FilesPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/fetchZipFiles");
+        const response = await axios.get("/api/fetchZipFiles");
         if (response.status !== 200) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

@@ -25,6 +25,7 @@ interface Data {
 interface File {
   _id: string;
   fileName: string;
+  invoices: any[];
   createdOn: string;
   fileType: string;
   data: Data;
@@ -55,16 +56,6 @@ export function FilesMainContent(props: FilesMainContentProps) {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
-
-  useEffect(() => {
-    // Loop over each file to check if invoices are done processing
-    props.files.forEach(file => {
-      if (file.invoices.length > 0) {
-        window.location.reload();
-        // Perform any additional logic you need here
-      }
-    });
-  }, [props.files]);
 
   const createWorkbookFromFiles = (files : any) => {
     console.log(files);
@@ -122,11 +113,9 @@ export function FilesMainContent(props: FilesMainContentProps) {
     });
   };
 
-  const handleDeleteClick = async (fileName: string) => {
+  const handleDeleteClick = async (file: File) => {
     try {
-      await axios.delete(
-        `http://localhost:3000/api/invoiceCollections?fileName=${fileName.fileName}`
-      );
+      await axios.delete(`/api/invoiceCollections?fileName=${file.fileName}`);
       window.location.reload();
     } catch (error) {
       console.error("Error deleting the file:", error);

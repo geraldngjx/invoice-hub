@@ -490,13 +490,6 @@ export function HomeMainContent(_props: HomeMainContentProps) {
                     </div>
                 </div>
             </div>
-            {/* Export to CSV button */}
-            <div className="mt-4">
-                <button onClick={exportToCSV} className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700">
-                    Export to CSV
-                </button>
-            </div>
-        </div>
     );
 }
 

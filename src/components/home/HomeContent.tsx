@@ -7,25 +7,31 @@ interface HomeContentProps {
     title: string;
 }
 
-interface File {
-    name: string;
-    createdOn: string;
-    type: string;
-    data: Data;
-}
-
-interface Data {
-    bill_to: string;
-    items: DataItem[];
-    amount_due: string;
-}
-
 interface DataItem {
     item_description: string;
     item_quantity: string;
     item_price: string;
     item_total: string;
     tax_amount: string;
+}
+
+interface Data {
+    bill_to: string;
+    items: DataItem[];
+    amount_due: string;
+    tax_amount: string;
+    bill_from: string;
+    invoice_number: string;
+    invoice_date: string;
+    grand_total: string;
+    transaction_description: string;
+}
+
+interface File {
+    name: string;
+    createdOn: string;
+    type: string;
+    data: Data; // Changed from JSON[] to Data
 }
 
 export function HomeContent(props: HomeContentProps) {

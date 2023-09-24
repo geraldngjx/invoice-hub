@@ -56,14 +56,18 @@ export function UploadContent(props: ContentProps) {
         saveToMongoDB(dataToSave, fileName);
         // Indicate successful upload
         console.log("Upload successful");
-        toast.success("Upload Successful");
+        toast.success("Upload Successful", {
+          autoClose: false, // To keep it open until you manually close it
+        });
       } else {
         // Handle the case where the response indicates failure
         console.error("Upload failed:", result.message);
         throw new Error(result.message);
       }
     } catch {
-      toast.error("Upload failed");
+      toast.error("Upload failed", {
+        autoClose: false, // To keep it open until you manually close it
+      });
     }
   };
 

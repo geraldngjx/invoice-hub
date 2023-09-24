@@ -6,74 +6,37 @@ interface ContentProps {
   files: File[];
 }
 
+interface DataItem {
+  item_description: string;
+  item_quantity: string;
+  item_price: string;
+  item_total: string;
+  tax_amount: string;
+}
+
+interface Data {
+  bill_to: string;
+  items: DataItem[];
+  amount_due: string;
+  tax_amount: string;
+  bill_from: string;
+  invoice_number: string;
+  invoice_date: string;
+  grand_total: string;
+  transaction_description: string;
+}
+
+interface File {
+  _id: string;
+  fileName: string;
+  createdOn: string;
+  fileType: string;
+  data: Data;
+}
+
 export function FilesContent(props: ContentProps) {
 
-  const mockJSONData = {
-    "header1": "value1",
-    "header2": "value2",
-    "header3": "value3",
-    parse() {
-      return Object.values(this);
-    },
-    stringify() {
-      return Object.values(this).join(",");
-    },
-    [Symbol.toStringTag]: "Object",
-  };
   const files = props;
-
-  // console.log(files);
-  // Mock data for testing
-  const mockFiles = [
-    {
-      name: "Document 1",
-      createdOn: "2023-09-25",
-      type: "PDF",
-      data: [mockJSONData],
-    },
-    {
-      name: "Presentation",
-      createdOn: "2023-09-24",
-      type: "PPT",
-      data: [mockJSONData],
-    },
-    {
-      name: "Spreadsheet",
-      createdOn: "2023-09-23",
-      type: "XLS",
-      data: [mockJSONData],
-    },
-    {
-      name: "Image 1",
-      createdOn: "2023-09-22",
-      type: "JPG",
-      data: [mockJSONData],
-    },
-    {
-      name: "Document 2",
-      createdOn: "2023-09-21",
-      type: "PDF",
-      data: [mockJSONData],
-    },
-    {
-      name: "Document 2",
-      createdOn: "2023-09-21",
-      type: "PDF",
-      data: [mockJSONData],
-    },
-    {
-      name: "Document 2",
-      createdOn: "2023-09-21",
-      type: "PDF",
-      data: [mockJSONData],
-    },
-    {
-      name: "Document 2",
-      createdOn: "2023-09-21",
-      type: "PDF",
-      data: [mockJSONData],
-    },
-  ];
 
   return (
     <div className="flex h-full flex-wrap">

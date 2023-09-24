@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import ExcelJS from "exceljs";
 
+interface DataItem {
+  item_description: string;
+  item_quantity: string;
+  item_price: string;
+  item_total: string;
+  tax_amount: string;
+}
 
 interface Data {
   bill_to: string;

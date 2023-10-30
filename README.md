@@ -1,21 +1,21 @@
-# FRIDAY
-Introducing FRIDAY, your AI-powered receipt and invoice processing assistant! 🤖
+# Invoice-Hub
+Introducing Invoice-Hub, your AI-powered receipt and invoice processing assistant! 🤖
 
-Tired of spending hours manually transcribing and organizing your scanned receipts and invoices? FRIDAY is here to revolutionize your workflow. This innovative app harnesses the power of artificial intelligence to streamline your administrative tasks in an AI hackathon-worthy fashion.
+Tired of spending hours manually transcribing and organizing your scanned receipts and invoices? Invoice-Hub is here to revolutionize your workflow. This innovative app harnesses the power of artificial intelligence to streamline your administrative tasks in an AI hackathon-worthy fashion.
 
-🧠 AI Magic: FRIDAY leverages cutting-edge AI technology to analyze scanned images, extracting text with remarkable precision. It understands and interprets your documents, saving you time and effort. No more tedious data entry or manual typing – let the AI do the heavy lifting.
+🧠 AI Magic: Invoice-Hub leverages cutting-edge AI technology to analyze scanned images, extracting text with remarkable precision. It understands and interprets your documents, saving you time and effort. No more tedious data entry or manual typing – let the AI do the heavy lifting.
 
-🚀 Unparalleled Convenience: With FRIDAY, you can effortlessly submit batches of scanned receipts and invoices. Friday doesn't just extract text; it organizes your data into a structured format. Say goodbye to the time-consuming task of processing images one by one.
+🚀 Unparalleled Convenience: With Invoice-Hub, you can effortlessly submit batches of scanned receipts and invoices. Invoice-Hub doesn't just extract text; it organizes your data into a structured format. Say goodbye to the time-consuming task of processing images one by one.
 
-📈 Boost Productivity: FRIDAY empowers you to quickly mass-produce and organize large volumes of scanned documents, unlocking newfound levels of efficiency. Spend less time on data entry and more time on what truly matters to you.
+📈 Boost Productivity: Invoice-Hub empowers you to quickly mass-produce and organize large volumes of scanned documents, unlocking newfound levels of efficiency. Spend less time on data entry and more time on what truly matters to you.
 
-Experience the future of document management with FRIDAY. Harness the power of AI to simplify your life and eliminate the hassle of manual data processing. With Friday, you can process large volumes of receipts and invoices in minutes, not hours. Welcome to the era of effortless efficiency!
+Experience the future of document management with Invoice-Hub. Harness the power of AI to simplify your life and eliminate the hassle of manual data processing. With Invoice-Hub, you can process large volumes of receipts and invoices in minutes, not hours. Welcome to the era of effortless efficiency!
 
 ## Implementation
 
 ![Friday Architecture](architecture.png)
 
-FRIDAY consists of a front-end web application and a back-end API. The front-end and back-end are built with Next.js. The AI service is hosted on AWS Lambda and makes use of AWS Textract, OpenAI and proprietary algorithms. The front-end and back-end are hosted on Vercel.
+Invoice-Hub consists of a front-end web application and a back-end API. The front-end and back-end are built with Next.js. The AI service is hosted on AWS Lambda and makes use of AWS Textract, OpenAI and proprietary algorithms. The front-end and back-end are hosted on Vercel.
 
 Our codebase is structured as follows:
 - `ml/` contains the AI service code
@@ -25,6 +25,9 @@ Our codebase is structured as follows:
 
 - `src/dashboard` and `src/pages`contains the front-end code and `src/components` contain the React Components powering our frontend.
 - `src/pages/api` contains the back-end code which handles the parsing of the documents and the communication with the AI service.
+
+## Pitch Presentation
+[Invoice-Hub Pitch Presentation.webm](https://github.com/geraldngjx/invoice-hub/assets/102348985/131ab6d4-9f0a-469d-96da-b699d33b33d7)
 
 
 ## Meet the Team
